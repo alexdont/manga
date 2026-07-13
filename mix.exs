@@ -2,7 +2,7 @@ defmodule Manga.MixProject do
   use Mix.Project
 
   @version "0.1.0"
-  @description "Batteries-included paged comic reader for Phoenix — manga-style page/spread reading with double-page pairing, RTL/LTR direction, rotation, smart crop, and per-page overrides, on top of fresco. Builds on the `manhwa` package for the shared reader core and long-strip mode, so one dep gives a complete reader with a per-series mode switch."
+  @description "Batteries-included paged comic reader for Phoenix — manga-style page/spread reading on fresco's pan-zoom canvas: double-page spreads, RTL/LTR direction, rotation, page overrides, and in-place chapter swaps. Builds on the manhwa package's reader core."
   @source_url "https://github.com/alexdont/manga"
 
   def project do
@@ -36,7 +36,7 @@ defmodule Manga.MixProject do
       maintainers: ["Alexander Don"],
       licenses: ["MIT"],
       links: %{"GitHub" => @source_url},
-      files: ~w(lib priv mix.exs README.md LICENSE CHANGELOG.md)
+      files: ~w(lib mix.exs README.md LICENSE CHANGELOG.md)
     ]
   end
 
