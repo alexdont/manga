@@ -7,12 +7,13 @@ defmodule Manga do
   Ships the full paged experience: double-page spreads with wide-page
   detection, RTL/LTR reading direction, rotation, smart crop, tap-zone
   presets, per-page overrides (insert blank / force solo), in-place
-  chapter swaps, progress persistence, and an optional annotation
-  layer. Builds on [`manhwa`](https://hex.pm/packages/manhwa) for the
-  shared reader core — so installing `manga` gives you both reading
-  modes with a per-series (and per-device) mode switch: paged series
-  render here, scroll series render the `manhwa` strip reader, on the
-  same URL.
+  chapter swaps, progress persistence, and an optional annotation layer.
+
+  Reading vertical-scroll comics? See the sibling package
+  [`manhwa`](https://hex.pm/packages/manhwa) — a long-strip reader for
+  the other reading mode. `manga` builds on its core, so a series whose
+  saved reading mode is `"scroll"` renders through the strip reader on
+  the same route.
 
   ## Wiring
 

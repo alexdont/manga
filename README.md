@@ -12,10 +12,10 @@ presets, skip-blank, in-place chapter swaps, progress persistence, an image
 proxy, and an optional annotation layer via
 [etcher](https://hex.pm/packages/etcher).
 
-Builds on [`manhwa`](https://hex.pm/packages/manhwa) for the shared reader
-core and long-strip mode — **installing `manga` gives you both reading
-modes** with a per-series (and per-device) mode switch on the same URL:
-paged series render here, scroll series render the manhwa strip reader.
+**Reading vertical-scroll comics?** That's the sibling package —
+[`manhwa`](https://hex.pm/packages/manhwa) — a long-strip reader for
+webtoons/manhwa/manhua with panel snap, auto-reader, and infinite
+chapter scrolling.
 
 ---
 
@@ -31,9 +31,10 @@ end
 
 ## Wire it up
 
-Identical to [`manhwa`](https://hexdocs.pm/manhwa) — one `Manhwa.Store`
-implementation and the same `config :manhwa` keys serve both modes. Just
-mount the `manga` macro instead:
+`manga` is built on the `manhwa` core, so the plumbing is the same
+contract: one `Manhwa.Store` implementation and the same `config :manhwa`
+keys (see the [manhwa docs](https://hexdocs.pm/manhwa)). Mount the `manga`
+macro:
 
 ```elixir
 # router.ex
@@ -61,6 +62,11 @@ CSS — add both packages to your Tailwind v4 sources (daisyUI v5 required):
 
 See the [manhwa README](https://hexdocs.pm/manhwa) for the Store contract
 and the optional adapters (annotations, GIF picker, etcher host).
+
+One behavior worth knowing: since the core tracks a per-series (and
+per-device) reading mode, a series whose saved mode is `"scroll"` renders
+through the strip reader on the same route — so mixed libraries read
+correctly without extra wiring.
 
 ## License
 
