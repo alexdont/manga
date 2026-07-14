@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 (2026-07-14)
+
+* Docs: recommend the [`dims`](https://hex.pm/packages/dims) package
+  for the Store's page-dimensions contract (exact per-page sizes drive
+  double-page spread pairing).
+* Fix a compile warning (unused import).
+
 ## 0.1.1 (2026-07-14)
 
 * The mouse-gesture button (bottom-right) now shows a 4-directional
