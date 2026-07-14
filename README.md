@@ -63,6 +63,13 @@ CSS — add both packages to your Tailwind v4 sources (daisyUI v5 required):
 See the [manhwa README](https://hexdocs.pm/manhwa) for the Store contract
 and the optional adapters (annotations, GIF picker, etcher host).
 
+The reader never fetches content itself — your store supplies page URLs,
+ideally **with dimensions** (the paged reader's double-page spread
+pairing needs exact per-page sizes). If your source only yields URLs,
+[`dims`](https://hex.pm/packages/dims) probes width × height from a
+~128 KB Range fetch — `Dims.probe_all/2` for the paged `:precise` hint,
+`Dims.probe_sampled/2` for strip-length lists.
+
 One behavior worth knowing: since the core tracks a per-series (and
 per-device) reading mode, a series whose saved mode is `"scroll"` renders
 through the strip reader on the same route — so mixed libraries read
