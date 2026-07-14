@@ -121,7 +121,7 @@
       <div class="flex items-center gap-1">
         <a :if={@prev_chapter} href={url_join(@series_base, @prev_chapter)}
            class="btn btn-soft text-xl min-h-[44px] min-w-[44px]" title="Previous chapter">«</a>
-        <span class="font-bold text-sm px-1">Ch. {@chapter}</span>
+        <span id="paged-chapter-label-mobile" class="font-bold text-sm px-1">Ch. {@chapter}</span>
         <span id="page-progress-mobile" class="text-xs text-base-content/60 px-1">p.{@page}/{@total_pages}</span>
         <a :if={@next_chapter} href={url_join(@series_base, @next_chapter)}
            class="btn btn-soft text-xl min-h-[44px] min-w-[44px]" title="Next chapter">»</a>
@@ -162,7 +162,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 20l7-7 7 7" /></svg>
     </a>
     <div class="flex flex-col items-center text-xs font-bold text-base-content/60 leading-tight">
-      <span>Ch. {@chapter}</span>
+      <span id="paged-chapter-label-desktop">Ch. {@chapter}</span>
       <span id="page-progress-desktop" class="text-[10px] text-base-content/40">p.{@page}/{@total_pages}</span>
     </div>
     <a :if={@next_chapter} href={url_join(@series_base, @next_chapter)} class="btn btn-sm btn-ghost" title="Next chapter">
@@ -1431,6 +1431,26 @@
 
         try { fitToPage(1); } catch (_) {}
         try { updatePageIndicator(); } catch (_) {}
+
+        // The swap keeps the page alive, so the server-rendered nav
+        // goes stale: sync the "Ch. N" labels and retarget the
+        // prev/next arrow anchors at the new chapter's neighbours.
+        // Anchors hide at the ends (no stale link on the last chapter);
+        // an arrow that never rendered (started on chapter 1 / latest)
+        // can't be materialized here — same as a full page load fixes.
+        const chLabel = "Ch. " + data.chapter;
+        ["paged-chapter-label-mobile", "paged-chapter-label-desktop"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = chLabel;
+        });
+        document.querySelectorAll('a[title="Previous chapter"]').forEach((a) => {
+          if (prevChapterUrl) a.href = prevChapterUrl;
+          a.classList.toggle("hidden", !prevChapterUrl);
+        });
+        document.querySelectorAll('a[title="Next chapter"]').forEach((a) => {
+          if (nextChapterUrl) a.href = nextChapterUrl;
+          a.classList.toggle("hidden", !nextChapterUrl);
+        });
 
         // Sync EtcherHostLive so the next annotation save targets the
         // new chapter's row.

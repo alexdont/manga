@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2026-07-14)
+
+* Fix: the nav's "Ch. N" labels and prev/next arrow anchors now track
+  in-place chapter swaps — they were server-rendered once and went
+  stale as reading chained across chapters (label stuck on the
+  starting chapter, arrows navigating relative to it). Arrows hide at
+  the ends instead of keeping a stale target.
+
 ## 0.1.0 (2026-07-13)
 
 Initial extraction from the Greenoak reader:
