@@ -2,6 +2,9 @@
 
 ## 0.1.1 (2026-07-14)
 
+* The mouse-gesture button (bottom-right) now shows a 4-directional
+  move icon instead of a right arrow, matching the OS auto-scroll
+  affordance it provides.
 * Fix: the nav's "Ch. N" labels and prev/next arrow anchors now track
   in-place chapter swaps — they were server-rendered once and went
   stale as reading chained across chapters (label stuck on the
