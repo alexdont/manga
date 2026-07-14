@@ -7,7 +7,7 @@ defmodule Manga.ReaderHTML do
   use Phoenix.Component
 
   import Manhwa.ReaderHTML,
-    only: [url_join: 2, series_slug: 1, clean_image_url: 1, proxied_url: 2]
+    only: [url_join: 2, series_slug: 1, proxied_url: 2]
 
   embed_templates "reader_html/*"
 
