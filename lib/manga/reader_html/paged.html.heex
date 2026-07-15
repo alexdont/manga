@@ -1366,10 +1366,19 @@
     // ids don't inherit the previous chapter's hidden state). Page
     // session — and Pointer Lock — survives, so gesture-mode reading
     // crosses chapter boundaries with zero interaction.
+    // Reading-time boundary hook — assigned by the progress-tracking
+    // block once `handle` exists. The in-place swap reassigns the
+    // `chapter`/`currentPage` closure vars, so any un-flushed reading
+    // time would be attributed to the NEW chapter at page 1; this
+    // flushes it against the outgoing chapter (including the
+    // still-focused page's dwell, which otherwise lands only on
+    // view-blur — the whole chapter, for a one-page extra).
+    let flushChapterBoundary = () => {};
     let chapterSwapInFlight = false;
     async function loadChapterInPlace(url) {
       if (chapterSwapInFlight) return;
       chapterSwapInFlight = true;
+      flushChapterBoundary();
       try {
         const params = new URLSearchParams({ direction, double_page: String(doubleMode) });
         // Page URLs are `${settingsBase}/${chapter}` — recover the chapter
@@ -2049,7 +2058,29 @@
         }
       }
 
+      // The focused page's dwell normally only lands on view-blur —
+      // so a flush mid-view (chapter swap, unload) would miss it, and
+      // for a short chapter that dwell IS most of the reading time.
+      // Track focus starts ourselves and let boundary flushes take the
+      // pending dwell directly; the tracker's own (late) blur for that
+      // same dwell is then dropped, time-boxed so a leftover flag can
+      // never eat a real dwell later.
+      let lastFocusAtMs = 0;
+      let dropBlurUntilMs = 0;
+
+      function captureFocusedDwell() {
+        if (!lastFocusAtMs) return;
+        chapterElapsedMs += Math.min(Date.now() - lastFocusAtMs, PER_IMAGE_CAP_MS);
+        lastFocusAtMs = 0;
+        dropBlurUntilMs = Date.now() + 2000;
+      }
+
       handle.on("view-blur", (e) => {
+        lastFocusAtMs = 0;
+        if (Date.now() < dropBlurUntilMs) {
+          dropBlurUntilMs = 0;
+          return;
+        }
         chapterElapsedMs += Math.min(e.durationMs || 0, PER_IMAGE_CAP_MS);
       });
 
@@ -2084,12 +2115,26 @@
 
       handle.on("view-focus", () => {
         viewFocusCount++;
+        lastFocusAtMs = Date.now();
         maybePromoteTransient();
         scheduleProgressSave();
       });
-      window.addEventListener("beforeunload", () => flushProgress({ keepalive: true }));
+      flushChapterBoundary = () => {
+        captureFocusedDwell();
+        clearTimeout(saveTimer);
+        flushProgress();
+      };
+      window.addEventListener("beforeunload", () => {
+        captureFocusedDwell();
+        flushProgress({ keepalive: true });
+      });
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") flushProgress({ keepalive: true });
+        if (document.visibilityState === "hidden") {
+          // fresco's own visibility listener (registered earlier) has
+          // already emitted the blur, so the capture is a no-op then.
+          captureFocusedDwell();
+          flushProgress({ keepalive: true });
+        }
       });
 
       // Smart-crop needs the image to actually be loaded before pixel

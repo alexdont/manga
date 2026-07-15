@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.3 (2026-07-15)
+
+* Reading-time fix: the in-place chapter swap now flushes accumulated
+  reading time against the *outgoing* chapter before rolling its
+  closure state forward — previously a quickly-read chapter's whole
+  time could be attributed to the next chapter at page 1, so short
+  chapters never crossed the host app's chapter-counting bar.
+* The currently-focused page's dwell (which only lands on `view-blur`)
+  is now captured directly on every boundary flush — chapter swap,
+  `beforeunload`, tab-hide — so the last page's reading time isn't
+  lost. For a one-page extra, that dwell is the whole chapter.
+
 ## 0.1.2 (2026-07-14)
 
 * Docs: recommend the [`dims`](https://hex.pm/packages/dims) package
