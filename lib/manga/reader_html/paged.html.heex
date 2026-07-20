@@ -404,7 +404,7 @@
        production paged reader. Updated in JS on every navigateTo. --%>
   <div id="page-indicator-bottom"
        class="fixed bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1 rounded-full bg-base-300/70 text-xs font-bold text-base-content/70 pointer-events-none">
-    {@page} / {@total_pages}
+    <span id="page-indicator-bottom-text">{@page} / {@total_pages}</span><span id="paged-read-check" class="text-success hidden" data-pct={Manhwa.Config.read_check_percent()}> {Manhwa.Config.read_check_mark()}</span>
   </div>
 
   <%!-- Pointer-lock gesture mode (desktop only). Click → browser hides
@@ -1309,14 +1309,33 @@
       return range + " / " + displayTotal;
     }
 
+    // Chapters the SERVER confirmed as counted-toward-read (via the
+    // progress-flush response). The ✓ first appears over the chapter's
+    // last 5% of pages — then LATCHES for that chapter
+    // (chaptersCheckShown), so paging back keeps showing the chapter
+    // was read to completion.
+    const chaptersReadServer = new Set();
+    const chaptersCheckShown = new Set();
     function updatePageIndicator() {
       const label = pageRangeLabel();
       const m = document.getElementById("page-progress-mobile");
       const d = document.getElementById("page-progress-desktop");
-      const b = document.getElementById("page-indicator-bottom");
+      const b = document.getElementById("page-indicator-bottom-text");
+      const check = document.getElementById("paged-read-check");
       if (m) m.textContent = "p." + label;
       if (d) d.textContent = "p." + label;
       if (b) b.textContent = label;
+      if (check) {
+        // Display gate for the ✓ (host-configurable, default: last 5%;
+        // 0 = show as soon as the host confirms the chapter).
+        const gateRaw = parseFloat(check.dataset.pct);
+        const gate = (Number.isFinite(gateRaw) ? gateRaw : 95) / 100;
+        const key = String(chapter);
+        if (total > 0 && currentPage / total >= gate && chaptersReadServer.has(key)) {
+          chaptersCheckShown.add(key);
+        }
+        check.classList.toggle("hidden", !chaptersCheckShown.has(key));
+      }
     }
     function navigateTo(page) {
       if (page < 1) {
@@ -2091,6 +2110,7 @@
         }
         const elapsed = Math.round(chapterElapsedMs / 1000);
         chapterElapsedMs = 0;
+        const flushedChapter = String(chapter);
         fetch(`${shell.dataset.settingsBase}/progress`, {
           method: "PUT",
           headers: {
@@ -2105,6 +2125,18 @@
             total_pages: total
           }),
           keepalive
+        }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+          // Server verdict on whether the flushed chapter counts as
+          // read — drives the pill's ✓. `false` also clears a stale
+          // mark (e.g. reread chapters restart their time bar).
+          if (!d || typeof d.chapter_read !== "boolean") return;
+          if (d.chapter_read) {
+            chaptersReadServer.add(flushedChapter);
+          } else {
+            chaptersReadServer.delete(flushedChapter);
+            chaptersCheckShown.delete(flushedChapter);
+          }
+          updatePageIndicator();
         }).catch(() => {});
       }
 

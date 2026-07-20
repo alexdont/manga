@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.4 (2026-07-17)
+
+* Read checkmark in the progress pill: once the host confirms a
+  chapter counts as read, the bottom-center indicator shows a green ✓
+  over the chapter's last 5% of pages — and latches for that chapter,
+  so paging back keeps showing it was read to completion. Confirmed
+  via manhwa 0.1.9's `save_progress` →
+  `{:ok, %{chapter_read: boolean}}` contract — hence the bumped
+  `{:manhwa, "~> 0.1.9"}` requirement. Stores that keep returning
+  `:ok` see no change; a `false` verdict clears a stale mark (rereads
+  restart their time bar). Shares manhwa's config:
+  `read_check_percent` (display gate, default 95) and
+  `read_check_mark` (default "✓").
+
 ## 0.1.3 (2026-07-15)
 
 * Reading-time fix: the in-place chapter swap now flushes accumulated

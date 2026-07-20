@@ -1,7 +1,7 @@
 defmodule Manga.MixProject do
   use Mix.Project
 
-  @version "0.1.3"
+  @version "0.1.4"
   @description "Batteries-included paged comic reader for Phoenix — manga-style page/spread reading on fresco's pan-zoom canvas: double-page spreads, RTL/LTR direction, rotation, page overrides, and in-place chapter swaps. Builds on the manhwa package's reader core."
   @source_url "https://github.com/alexdont/manga"
 
@@ -24,7 +24,7 @@ defmodule Manga.MixProject do
 
   defp deps do
     [
-      {:manhwa, "~> 0.1"},
+      {:manhwa, "~> 0.1.9"},
       {:fresco, "~> 0.7 or ~> 0.8"},
       {:ex_doc, "~> 0.39", only: :dev, runtime: false}
     ]
