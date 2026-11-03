@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.5 (2026-11-03)
+
+* Fix: on fresco 0.15 the paged reader opened on the middle of the
+  chapter — blank, on pages not yet loaded — at 0° rotation (90°/-90°
+  were fine). The reader limits panning to the current page or spread
+  (`setPanBounds`); fresco 0.15 centres the *whole canvas* when the pan
+  bounds fit on screen unless the canvas asks otherwise, and on a canvas
+  of every page that is the chapter's middle. The canvas now passes
+  `pan_centre={:bounds}`, so the page being read is what is centred, as
+  before. `pan_centre` is new in fresco 0.15, hence `{:fresco, "~> 0.15"}`
+  (was `~> 0.7 or ~> 0.8`).
+
 ## 0.1.4 (2026-07-17)
 
 * Read checkmark in the progress pill: once the host confirms a

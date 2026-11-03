@@ -377,8 +377,12 @@
        :gestures and :view_tracking are kept (no observed problem).
   --%>
   <div class="relative flex-1 min-h-0">
+    <%!-- `pan_centre={:bounds}`: the pan bounds are the current page/spread (see `fitToPage`),
+         and when they fit on screen that page is what gets centred. Fresco 0.15 centres the whole
+         canvas instead unless asked — on a canvas of every page, the middle of the chapter. --%>
     <Fresco.canvas
       id="fresco-reader"
+      pan_centre={:bounds}
       canvas={fresco_canvas(@images, @direction, @etcher_annotations, @page, @double_page, @spread_starts, @proxy_url)}
       class="w-full h-full"
       theme={:inherit}
